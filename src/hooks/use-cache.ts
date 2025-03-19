@@ -1,11 +1,16 @@
 import { useState, useEffect } from "react";
 import { DataCache } from "../cache/data-cache";
+import { DEFAULT_TTL } from "../constants";
+
+interface CacheConfig<T> {
+  defaultValue: T | (() => Promise<T>);
+  ttl?: number;
+  cacheInstance: DataCache;
+}
 
 export function useCache<T>(
   key: string,
-  fetcher: () => Promise<T>,
-  ttl: number,
-  cacheInstance: DataCache
+  { defaultValue, ttl, cacheInstance }: CacheConfig<T>
 ) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -14,10 +19,19 @@ export function useCache<T>(
   useEffect(() => {
     let isMounted = true;
 
-    async function loadCache() {
+    const loadCache = async () => {
+      const fetcher =
+        typeof defaultValue === "function"
+          ? defaultValue
+          : () => Promise.resolve(defaultValue);
+
       try {
         setLoading(true);
-        const cachedData = await cacheInstance.getOrSet<T>(key, fetcher, ttl);
+        const cachedData = await cacheInstance.getOrSet<T>(
+          key,
+          fetcher as () => Promise<T>,
+          ttl || DEFAULT_TTL
+        );
         if (isMounted) {
           setData(cachedData);
           setLoading(false);
@@ -28,14 +42,14 @@ export function useCache<T>(
           setLoading(false);
         }
       }
-    }
+    };
 
     loadCache();
 
     return () => {
-      isMounted = false; // Prevent state updates on unmounted component
+      isMounted = false; // Prevent updates after component unmount
     };
-  }, [key, fetcher, ttl, cacheInstance]);
+  }, [key, ttl, cacheInstance]);
 
   return { data, loading, error };
 }

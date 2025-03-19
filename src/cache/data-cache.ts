@@ -40,7 +40,7 @@ export class DataCache {
     const store = await this.getAvailableStore();
     if (!store) throw new Error("No available storage provider");
     const expiresAt = ttl === -1 ? -1 : Date.now() + ttl * 1000;
-    await store.setItem(key, JSON.stringify({ value, expiresAt }));
+    await store.setItem(key, { value, expiresAt });
   }
 
   async get<T>(key: string): Promise<T | null> {

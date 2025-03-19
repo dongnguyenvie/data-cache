@@ -102,12 +102,11 @@ function UserProfile() {
     data: user,
     loading,
     error,
-  } = useCache(
-    "user",
-    async () => fetch("/api/user").then((res) => res.json()),
-    600,
-    cache
-  );
+  } = useCache("user", {
+    defaultValue: async () => fetch("/api/user").then((res) => res.json()),
+    ttl: 600, // Optional TTL in seconds, defaults to 60s
+    cacheInstance: cache,
+  });
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
