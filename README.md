@@ -102,6 +102,7 @@ function UserProfile() {
     data: user,
     loading,
     error,
+    setData: setUser,
   } = useCache("user", {
     defaultValue: async () => fetch("/api/user").then((res) => res.json()),
     ttl: 600, // Optional TTL in seconds, defaults to 60s

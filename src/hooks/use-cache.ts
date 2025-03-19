@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DataCache } from "../cache/data-cache";
 import { DEFAULT_TTL } from "../constants";
 
@@ -16,40 +16,42 @@ export function useCache<T>(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
+  const fetcher = useCallback(
+    () =>
+      typeof defaultValue === "function"
+        ? (defaultValue as () => Promise<T>)()
+        : Promise.resolve(defaultValue),
+    [defaultValue]
+  );
+
   useEffect(() => {
-    let isMounted = true;
-
     const loadCache = async () => {
-      const fetcher =
-        typeof defaultValue === "function"
-          ? defaultValue
-          : () => Promise.resolve(defaultValue);
-
       try {
         setLoading(true);
         const cachedData = await cacheInstance.getOrSet<T>(
           key,
-          fetcher as () => Promise<T>,
+          fetcher,
           ttl || DEFAULT_TTL
         );
-        if (isMounted) {
-          setData(cachedData);
-          setLoading(false);
-        }
+        setData(cachedData);
+        setLoading(false);
       } catch (err) {
-        if (isMounted) {
-          setError(err as Error);
-          setLoading(false);
-        }
+        setError(err as Error);
+        setLoading(false);
       }
     };
 
     loadCache();
+  }, []);
 
-    return () => {
-      isMounted = false; // Prevent updates after component unmount
-    };
-  }, [key, ttl, cacheInstance]);
+  const setCachedData = async (newData: T) => {
+    try {
+      await cacheInstance.set(key, newData, ttl || DEFAULT_TTL);
+      setData(newData);
+    } catch (err) {
+      setError(err as Error);
+    }
+  };
 
-  return { data, loading, error };
+  return { data, loading, error, setData: setCachedData };
 }
