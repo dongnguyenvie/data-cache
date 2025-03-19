@@ -1,0 +1,40 @@
+{
+  "name": "@nolanx/data-cache",
+  "version": "1.0.0",
+  "description": "A flexible caching library for JavaScript/TypeScript with multiple storage provider support.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint . --ext .ts",
+    "prepackage:publish": "npm run build",
+    "package:publish": "npm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dongnguyenvie/data-cache.git"
+  },
+  "keywords": [
+    "cache",
+    "data-cache",
+    "typescript",
+    "storage",
+    "localstorage",
+    "indexeddb",
+    "memory-cache",
+    "react-hook"
+  ],
+  "author": "nolanx",
+  "license": "MIT",
+  "dependencies": {},
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "eslint": "^8.0.0",
+    "@types/react": "^18.0.0"
+  }
+}
