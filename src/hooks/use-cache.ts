@@ -5,12 +5,12 @@ import { DEFAULT_TTL } from "../constants";
 interface CacheConfig<T> {
   defaultValue: T | (() => Promise<T>);
   ttl?: number;
-  cacheInstance: DataCache;
+  cacheProvider: DataCache;
 }
 
 export function useCache<T>(
   key: string,
-  { defaultValue, ttl, cacheInstance }: CacheConfig<T>
+  { defaultValue, ttl, cacheProvider }: CacheConfig<T>
 ) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,11 +28,7 @@ export function useCache<T>(
     const loadCache = async () => {
       try {
         setLoading(true);
-        const cachedData = await cacheInstance.getOrSet<T>(
-          key,
-          fetcher,
-          ttl || DEFAULT_TTL
-        );
+        const cachedData = await cacheProvider.getOrSet<T>(key, fetcher, ttl);
         setData(cachedData);
         setLoading(false);
       } catch (err) {
@@ -42,16 +38,22 @@ export function useCache<T>(
     };
 
     loadCache();
-  }, []);
+  }, [key]);
 
   const setCachedData = async (newData: T) => {
     try {
-      await cacheInstance.set(key, newData, ttl || DEFAULT_TTL);
+      await cacheProvider.set(key, newData, ttl);
       setData(newData);
     } catch (err) {
       setError(err as Error);
     }
   };
 
-  return { data, loading, error, setData: setCachedData };
+  return {
+    data,
+    loading,
+    ready: !loading,
+    error,
+    setData: setCachedData,
+  };
 }

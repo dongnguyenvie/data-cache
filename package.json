@@ -1,6 +1,6 @@
 {
   "name": "@nolanx/data-cache",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A flexible caching library for JavaScript/TypeScript with multiple storage provider support.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

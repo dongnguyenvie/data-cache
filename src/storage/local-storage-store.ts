@@ -1,11 +1,13 @@
-import { STORE_KEY } from "../constants";
-import { StoreProvider } from "../index";
+import { DEFAULT_TTL, STORE_KEY } from "../constants";
+import { StoreProvider, StoreProviderConfig } from "../index";
 
 export class LocalStorageStore implements StoreProvider {
   private storageKey: string;
+  public ttl: number;
 
-  constructor(storageKey = STORE_KEY) {
+  constructor(storageKey = STORE_KEY, options?: StoreProviderConfig) {
     this.storageKey = storageKey;
+    this.ttl = options?.ttl ?? DEFAULT_TTL;
   }
 
   private getStorageData(): Record<string, string> {

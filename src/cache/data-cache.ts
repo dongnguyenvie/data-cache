@@ -36,10 +36,11 @@ export class DataCache {
     return this.availableStore;
   }
 
-  async set<T>(key: string, value: T, ttl: number): Promise<void> {
+  async set<T>(key: string, value: T, ttl?: number): Promise<void> {
     const store = await this.getAvailableStore();
     if (!store) throw new Error("No available storage provider");
-    const expiresAt = ttl === -1 ? -1 : Date.now() + ttl * 1000;
+    const $ttl = ttl ?? store.ttl;
+    const expiresAt = $ttl === -1 ? -1 : Date.now() + $ttl * 1000;
     await store.setItem(key, { value, expiresAt });
   }
 
@@ -75,7 +76,7 @@ export class DataCache {
   async getOrSet<T>(
     key: string,
     fetcher: () => Promise<T>,
-    ttl: number
+    ttl?: number
   ): Promise<T> {
     const cachedValue = await this.get<T>(key);
     if (cachedValue !== null) {

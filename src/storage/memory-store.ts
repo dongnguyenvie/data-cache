@@ -1,7 +1,13 @@
-import { StoreProvider } from "../index";
+import { DEFAULT_TTL } from "../constants";
+import { StoreProvider, StoreProviderConfig } from "../index";
 
 export class MemoryStore implements StoreProvider {
   private dataMap: Map<string, string> = new Map();
+  public ttl: number;
+
+  constructor(options?: StoreProviderConfig) {
+    this.ttl = options?.ttl ?? DEFAULT_TTL;
+  }
 
   async getItem<T>(key: string): Promise<T | null> {
     const item = this.dataMap.get(key);

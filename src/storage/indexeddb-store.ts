@@ -1,14 +1,21 @@
-import { StoreProvider } from "../index";
+import { DEFAULT_TTL } from "../constants";
+import { StoreProvider, StoreProviderConfig } from "../index";
 
 export class IndexedDBStore implements StoreProvider {
   private dbName: string;
   private storeName: string;
   private db: IDBDatabase | null = null;
+  public ttl: number;
 
-  constructor(dbName = "NolanDataCache", storeName = "cache") {
+  constructor(
+    dbName = "NolanDataCache",
+    storeName = "cache",
+    options?: StoreProviderConfig
+  ) {
     this.dbName = dbName;
     this.storeName = storeName;
     this.initDB();
+    this.ttl = options?.ttl ?? DEFAULT_TTL;
   }
 
   private async initDB() {
