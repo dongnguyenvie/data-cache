@@ -126,6 +126,7 @@ function UserProfile() {
 | `getAll()`                    | Gets all non-expired cache entries     |
 | `invalidate(key)`             | Removes a specific key from cache      |
 | `clearAll()`                  | Clears all cached data                 |
+| `clearExpired()`             | Clears expired cache entries            |
 
 ## 📦 Publish & Usage
 

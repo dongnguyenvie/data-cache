@@ -98,4 +98,16 @@ export class DataCache {
     if (!store) return;
     await store.clear();
   }
+
+  async clearExpired(): Promise<void> {
+    const store = await this.getAvailableStore();
+    if (!store) return;
+    const allItems = await store.getAll<{ value: any; expiresAt: number }>();
+    for (const key in allItems) {
+      const item = allItems[key];
+      if (item.expiresAt !== -1 && item.expiresAt < Date.now()) {
+        await store.removeItem(key);
+      }
+    }
+  }
 }
